@@ -7,6 +7,7 @@ from staticpreprocessor.processors import CommandListProcessor
 class SassProcessor(CommandListProcessor):
 
     compass = False
+    extensions = ['.sass', '.scss']
 
     def get_command(self, **kwargs):
         return 'sass --no-cache {compass_string} {input} {output}'.format(

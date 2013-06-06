@@ -9,6 +9,7 @@ class LessProcessor(CommandListProcessor):
     compress = True
     yui_compress = False
     optimization = None
+    extensions = ['.less']
 
     def get_command(self, **kwargs):
         return 'lessc --silent {compass_string} {yui_compress_string} '\
