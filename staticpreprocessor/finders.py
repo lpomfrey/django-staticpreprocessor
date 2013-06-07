@@ -12,7 +12,8 @@ from django.utils._os import safe_join
 
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.finders import (
-    BaseFinder, AppDirectoriesFinder as BaseAppDirectoriesFinder)
+    BaseFinder, AppDirectoriesFinder as BaseAppDirectoriesFinder
+)
 
 from .storage import StaticPreprocessorAppStorage
 
@@ -80,7 +81,7 @@ class FileSystemFinder(BaseFinder):
         if os.path.exists(path):
             return path
 
-    def list(self, ignore_patterns=[]):
+    def list(self, ignore_patterns):
         '''
         List all files in all locations.
         '''

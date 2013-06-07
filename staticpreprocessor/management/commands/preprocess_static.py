@@ -70,7 +70,7 @@ class Command(NoArgsCommand):
 
         found_files = SortedDict()
         for finder in finders.get_finders():
-            for path, storage in finder.list():
+            for path, storage in finder.list([]):
                 # Prefix the relative path if the source storage contains it
                 if getattr(storage, 'prefix', None):
                     prefixed_path = os.path.join(storage.prefix, path)
