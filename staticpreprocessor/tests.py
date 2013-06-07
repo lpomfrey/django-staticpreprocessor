@@ -11,6 +11,7 @@ from django.test.utils import override_settings
 from mock import patch, MagicMock
 
 from staticpreprocessor.conf import StaticPreprocessorAppConf, settings
+from staticpreprocessor.contrib.processors import sass, less
 from staticpreprocessor.finders import FileSystemFinder
 from staticpreprocessor.processors import (
     BaseProcessor, BaseListProcessor, BaseFileProcessor, CommandProcessorMixin,
@@ -309,3 +310,32 @@ class TestStaticPreprocessorStorage(TestCase):
                 ret = storage.get_available_name('file.txt')
                 self.assertEqual(ret, 'file.txt')
                 self.assertFalse(delete.called)
+
+
+class TestContribProcessors(TestCase):
+
+    def test_sass_get_command(self):
+        processor = sass.SassProcessor(compass=True)
+        self.assertEqual(
+            processor.get_command(input='input', output='output'),
+            'sass --no-cache --compass input output',
+        )
+        processor = sass.SassProcessor(compass=False)
+        self.assertEqual(
+            processor.get_command(input='input2', output='output2'),
+            'sass --no-cache  input2 output2',
+        )
+
+    def test_less_get_command(self):
+        processor = less.LessProcessor(
+            compress=True, yui_compress=True, optimization=2)
+        self.assertEqual(
+            processor.get_command(input='input', output='output'),
+            'lessc --silent --compress --yui-compress -O2 input output',
+        )
+        processor = less.LessProcessor(
+            compress=False, yui_compress=False, optimization=None)
+        self.assertEqual(
+            processor.get_command(input='input2', output='output2'),
+            'lessc --silent    input2 output2',
+        )
