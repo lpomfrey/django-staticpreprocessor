@@ -3,8 +3,8 @@
     You can adapt this file completely to your liking, but it should at least
     contain the root `toctree` directive.
 
-Welcome to django-staticpreprocessor's documentation!
-=====================================================
+django-staticpreprocessor
+=========================
 
 django-staticpreprocessor is a Django app to simplify the pre-processing of
 static assets.
@@ -21,7 +21,8 @@ then be collected by collectstatic.
 Contents
 --------
 .. toctree::
-    :maxdepth: 3
+    :maxdepth: 2
 
     installation
     usage
+    examples
