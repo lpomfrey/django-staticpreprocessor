@@ -8,11 +8,15 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import patch
+from mock import patch, MagicMock
 
 from staticpreprocessor.conf import StaticPreprocessorAppConf, settings
 from staticpreprocessor.finders import FileSystemFinder
-from staticpreprocessor.processors import BaseProcessor
+from staticpreprocessor.processors import (
+    BaseProcessor, BaseListProcessor, BaseFileProcessor, CommandProcessorMixin,
+    CommandListProcessor, CommandFileProcessor,
+)
+from staticpreprocessor.storage import StaticPreprocessorFileStorage
 
 
 TEST_PROJECT = os.path.abspath(
@@ -182,3 +186,126 @@ class TestBaseProcessor(TestCase):
             ['/path/to/some/file.txt'],
             sorted(list(processor.get_file_list()))
         )
+
+
+class TestBaseListProcessor(TestCase):
+
+    files = [
+        '/path/to/some/file.txt',
+        '/some/handlebars/template.handlebars',
+        '/lots/of/less/css.less',
+        '/and/some/sassy/css.sass',
+    ]
+
+    @patch('staticpreprocessor.processors.get_files')
+    def test_handle_list(self, get_files):
+        get_files.return_value = (f for f in self.files)
+        processor = BaseListProcessor(remove_processed_files=False)
+        with patch.object(processor, 'handle_list') as handle_list:
+            processor.handle()
+            handle_list.assert_called_with(
+                get_files.return_value, **{'remove_processed_files': False})
+
+    @patch('staticpreprocessor.processors.get_files')
+    def test_handle_list_deletes(self, get_files):
+        get_files.return_value = (f for f in self.files)
+        processor = BaseListProcessor(remove_processed_files=True)
+        storage = MagicMock()
+        processor.storage = storage
+        with patch.object(processor, 'handle_list') as handle_list:
+            processor.handle()
+            handle_list.assert_called_with(
+                get_files.return_value, **{'remove_processed_files': True})
+            self.assertEqual(storage.delete.call_count, 4)
+
+
+class TestBaseFileProcessor(TestCase):
+
+    def test_handle_file(self):
+        processor = BaseFileProcessor()
+        with patch.object(processor, 'handle_file') as handle_file:
+            kwargs = {'a': 1, 'b': 2}
+            processor.handle_list(['/path/to/file.txt'], **kwargs)
+            handle_file.assert_called_with('/path/to/file.txt', **kwargs)
+
+
+class TestCommandProcessorMixin(TestCase):
+
+    @patch('staticpreprocessor.processors.envoy')
+    def test_bails_on_no_input(self, envoy):
+        mixin = CommandProcessorMixin(require_input=True)
+        mixin.run_command('')
+        self.assertFalse(envoy.run.called)
+
+    def test_get_command(self):
+        mixin = CommandProcessorMixin()
+        mixin.command = 'cat {input} > {output}'
+        command = mixin.get_command(
+            input='/an/input/file.txt', output='output.txt')
+        self.assertEqual(command, 'cat /an/input/file.txt > output.txt')
+
+    @patch('staticpreprocessor.processors.envoy')
+    def test_run_command(self, envoy):
+        envoy.run.return_value.status_code = 0
+        storage = MagicMock()
+        storage.path.side_effect = lambda f: os.path.join('/prefix/path/', f)
+        mixin = CommandProcessorMixin(
+            output='js/processed.js',
+            command='cat {input} > {output}',
+            storage=storage,
+        )
+        mixin.run_command('input.txt')
+        envoy.run.assert_called_with(
+            'cat input.txt > /prefix/path/js/processed.js')
+
+    @patch('staticpreprocessor.processors.envoy')
+    def test_run_command_failure(self, envoy):
+        envoy.run.return_value.status_code = 1
+        mixin = CommandProcessorMixin(
+            output='js/processed.js',
+            command='cat {input} > {output}',
+        )
+        with self.assertRaises(RuntimeError):
+            mixin.run_command('input.txt')
+
+
+class TestCommandProcessors(TestCase):
+
+    def test_handle_list(self):
+        processor = CommandListProcessor()
+        with patch.object(processor, 'run_command') as run_command:
+            kwargs = {'a': 1, 'b': 2}
+            processor.handle_list(['a.txt', 'b.js', 'c.css'], **kwargs)
+            run_command.assert_called_with('a.txt b.js c.css', **kwargs)
+
+    def test_handle_file(self):
+        processor = CommandFileProcessor()
+        with patch.object(processor, 'run_command') as run_command:
+            kwargs = {'a': 1, 'b': 2}
+            processor.handle_file('a.txt', **kwargs)
+            run_command.assert_called_with('a.txt', **kwargs)
+
+
+class TestStaticPreprocessorStorage(TestCase):
+
+    def test_no_base_url(self):
+        storage = StaticPreprocessorFileStorage()
+        self.assertEqual(storage.base_url, None)
+
+    def test_get_available_name_existing(self):
+        storage = StaticPreprocessorFileStorage()
+        with patch.object(storage, 'exists') as exists:
+            with patch.object(storage, 'delete') as delete:
+                exists.return_value = True
+                ret = storage.get_available_name('file.txt')
+                self.assertEqual(ret, 'file.txt')
+                delete.assert_called_with('file.txt')
+
+    def test_get_available_name_not_existing(self):
+        storage = StaticPreprocessorFileStorage()
+        with patch.object(storage, 'exists') as exists:
+            with patch.object(storage, 'delete') as delete:
+                exists.return_value = False
+                ret = storage.get_available_name('file.txt')
+                self.assertEqual(ret, 'file.txt')
+                self.assertFalse(delete.called)

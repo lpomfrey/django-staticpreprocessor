@@ -83,7 +83,7 @@ class BaseFileProcessor(BaseListProcessor):
             self.handle_file(file, **kwargs)
 
 
-class CommandProcessorMixin(BaseListProcessor):
+class CommandProcessorMixin(BaseProcessor):
 
     command = ''
     output = ''
@@ -100,7 +100,7 @@ class CommandProcessorMixin(BaseListProcessor):
             'input': input,
             'output': self.storage.path(self.output),
         })
-        command = self.get_command(input=input, **kwargs)
+        command = self.get_command(**kwargs)
         r = envoy.run(command)
         if not r.status_code in self.expected_return_codes:
             raise RuntimeError(
