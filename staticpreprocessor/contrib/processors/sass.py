@@ -8,6 +8,7 @@ class SassProcessor(CommandListProcessor):
 
     compass = False
     extensions = ['.sass', '.scss']
+    output = 'sass_styles.css'
 
     def get_command(self, **kwargs):
         return 'sass --no-cache {compass_string} {input} {output}'.format(
