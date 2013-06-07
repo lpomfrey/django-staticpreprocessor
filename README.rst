@@ -12,4 +12,4 @@ In short, if you want to compile sass or less files, or handlebars or other
 templates before deploying and running `collectstatic`, you may want to use
 this.
 
-Documentation and tests coming soon.
+Documentation is on `ReadTheDocs <https://django-staticpreprocessor.readthedocs.org/en/latest/>`_.
