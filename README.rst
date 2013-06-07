@@ -1,7 +1,7 @@
 Django Static Preprocessor
 ==========================
 
-:Version: 0.1.0pre
+:Version: 0.1.0
 :Author: Luke Pomfrey
 
 Overview
