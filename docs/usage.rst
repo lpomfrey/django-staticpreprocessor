@@ -61,6 +61,7 @@ as either dotted-paths, or otherwise, e.g.:
     from staticpreprocessor.contrib.processors.less import LessProcessor
     from staticpreprocessor.contrib.processors.sass import SassProcessor
     from staticpreprocessor.processors import CommandListProcessor
+
     STATIC_PREPROCESSOR_PROCESSORS = (
         'staticpreprocessor.contrib.processors.HandlebarsProcessor',
         LessProcessor,
