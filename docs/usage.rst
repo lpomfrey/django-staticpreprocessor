@@ -70,7 +70,8 @@ as either dotted-paths, or otherwise, e.g.:
     )
 
 
-There are several base processor classes that can be extended and used:
+There are several base processor classes in ``staticpreprocessor.processors`` 
+that can be extended and used:
 
 .. py:class:: BaseProcessor
 
@@ -229,10 +230,19 @@ passed to ``__init__``.
 
 Contrib Processors
 ~~~~~~~~~~~~~~~~~~
+.. py:module:: staticpreprocessor.contrib.processors
 
 There are several processors included in the 
 ``staticpreprocessor.contrib.processors`` module.
 
-.. py:class:: staticpreprocessor.contrib.processors.handlebars.HandlebarsProcessor
+.. py:class:: handlebars.HandlebarsProcessor
 
     Processes all ``.handlebars`` files into ``handlebars_templates.js``.
+
+.. py:class:: sass.SassProcessor
+
+    Processes all ``.sass`` and ``.scss`` files into ``sass_styles.css``.
+
+.. py:class:: less.LessProcessor
+
+    Processes all ``.less`` files into ``less_styles.css``.
