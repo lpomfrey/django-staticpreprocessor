@@ -8,9 +8,11 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.test import TestCase
 from django.test.utils import override_settings
+from mock import patch
 
 from staticpreprocessor.conf import StaticPreprocessorAppConf, settings
 from staticpreprocessor.finders import FileSystemFinder
+from staticpreprocessor.processors import BaseProcessor
 
 
 TEST_PROJECT = os.path.abspath(
@@ -112,3 +114,71 @@ class TestAppDirectoriesFinder(TestCase):
         with open(os.path.join(
                 TEST_PROJECT, 'processedstatic', 'testappfile.txt'), 'r') as f:
             self.assertEqual(f.read().strip(), 'I am an application test file')
+
+
+class TestBaseProcessor(TestCase):
+
+    files = [
+        '/path/to/some/file.txt',
+        '/some/handlebars/template.handlebars',
+        '/lots/of/less/css.less',
+        '/and/some/sassy/css.sass',
+    ]
+
+    @patch('staticpreprocessor.processors.get_files')
+    def test_default_list(self, get_files):
+        get_files.return_value = (f for f in self.files)
+        processor = BaseProcessor()
+        self.assertEqual(
+            sorted(self.files),
+            sorted(list(processor.get_file_list()))
+        )
+
+    @patch('staticpreprocessor.processors.get_files')
+    def test_extensions(self, get_files):
+        get_files.return_value = (f for f in self.files)
+        processor = BaseProcessor(extensions=['.sass', '.less'])
+        self.assertEqual(
+            sorted(['/lots/of/less/css.less', '/and/some/sassy/css.sass']),
+            sorted(list(processor.get_file_list()))
+        )
+
+    @patch('staticpreprocessor.processors.get_files')
+    def test_exclude_match(self, get_files):
+        get_files.return_value = (f for f in self.files)
+        processor = BaseProcessor(exclude_match='*.txt')
+        self.assertEqual(
+            sorted(['/some/handlebars/template.handlebars',
+                    '/lots/of/less/css.less',
+                    '/and/some/sassy/css.sass']),
+            sorted(list(processor.get_file_list()))
+        )
+
+    @patch('staticpreprocessor.processors.get_files')
+    def test_exclude_regex(self, get_files):
+        get_files.return_value = (f for f in self.files)
+        processor = BaseProcessor(exclude_regex=r'.*\.txt$')
+        self.assertEqual(
+            sorted(['/some/handlebars/template.handlebars',
+                    '/lots/of/less/css.less',
+                    '/and/some/sassy/css.sass']),
+            sorted(list(processor.get_file_list()))
+        )
+
+    @patch('staticpreprocessor.processors.get_files')
+    def test_include_match(self, get_files):
+        get_files.return_value = (f for f in self.files)
+        processor = BaseProcessor(include_match='*.txt')
+        self.assertEqual(
+            ['/path/to/some/file.txt'],
+            sorted(list(processor.get_file_list()))
+        )
+
+    @patch('staticpreprocessor.processors.get_files')
+    def test_include_regex(self, get_files):
+        get_files.return_value = (f for f in self.files)
+        processor = BaseProcessor(include_regex=r'.*\.txt$')
+        self.assertEqual(
+            ['/path/to/some/file.txt'],
+            sorted(list(processor.get_file_list()))
+        )

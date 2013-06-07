@@ -42,16 +42,16 @@ class BaseProcessor(object):
         if self.exclude_regex:
             exclude_regex = re.compile(self.exclude_regex)
             file_list = itertools.ifilter(
-                lambda f: not bool(exclude_regex.search(f)))
+                lambda f: not bool(exclude_regex.search(f)), file_list)
         if self.include_match:
             file_list = itertools.ifilter(
-                lambda f: not fnmatch.fnmatch(f, self.include_match),
+                lambda f: fnmatch.fnmatch(f, self.include_match),
                 file_list
             )
         if self.include_regex:
             include_regex = re.compile(self.include_regex)
             file_list = itertools.ifilter(
-                lambda f: not bool(include_regex.search(f)))
+                lambda f: bool(include_regex.search(f)), file_list)
         return file_list
 
     def handle(self, **kwargs):
