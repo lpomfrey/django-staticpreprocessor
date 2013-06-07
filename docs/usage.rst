@@ -4,7 +4,8 @@ Usage
 Add ``staticpreprocessor`` to your ``INSTALLED_APPS``.
 
 Create a directory to hold your pre-compiled static assets, set the
-``STATIC_PREPROCESSOR_ROOT`` setting, add add it to ``STATICFILES_DIRS``:
+:py:data:`STATIC_PREPROCESSOR_ROOT <staticpreprocessor.conf.STATIC_PREPROCESSOR_ROOT>` 
+setting, add add it to ``STATICFILES_DIRS``:
 
 ::
 
@@ -14,6 +15,17 @@ Create a directory to hold your pre-compiled static assets, set the
         STATIC_PREPROCESSOR_ROOT,
         ...
     )
+
+Quickstart
+----------
+
+- Add your required finders to the 
+  :py:data:`STATIC_PREPROCESSOR_FINDERS <staticpreprocessor.conf.STATIC_PREPROCESSOR_FINDERS>` 
+  list.
+- Add your required processors to the 
+  :py:data:`STATIC_PREPROCESSOR_PREPROCESSORS <staticpreprocessor.conf.STATIC_PREPROCESSOR_PROCESSORS>` 
+  list.
+- Run the ``preprocess_static`` management command.
 
 
 Finders
@@ -36,7 +48,8 @@ Finders are exactly the same in concept as staticfiles finders.
     directory under each app, files are collected from ``/rawstatic/``.
 
 In order to use the finders they should be added to the
-``STATIC_PREPROCESSOR_FINDERS`` setting, e.g.:
+:py:data:`STATIC_PREPROCESSOR_FINDERS <staticpreprocessor.conf.STATIC_PREPROCESSOR_FINDERS>` 
+setting, e.g.:
 ::
 
     STATIC_PREPROCESSOR_DIRS = \
@@ -199,7 +212,8 @@ that can be extended and used:
     .. py:attribute:: output
         
         A path to an output file. This will be passed through ``storage.path`` 
-        so it may be relative to ``STATIC_PREPROCESSOR_ROOT``.
+        so it may be relative to 
+        :py:data:`STATIC_PREPROCESSOR_ROOT <staticpreprocessor.conf.STATIC_PREPROCESSOR_ROOT>`.
 
     .. py:attribute:: expected_return_codes
 
@@ -247,3 +261,83 @@ There are several processors included in the
 .. py:class:: less.LessProcessor
 
     Processes all ``.less`` files into ``less_styles.css``.
+
+
+``preprocess_static`` Management Command
+----------------------------------------
+.. py:module:: staticpreprocessor.management.commands
+
+Once you've added your finders and processors to your settings file, 
+you can run the ``preprocess_static`` management command.
+
+This will find all of your raw static files, collect them into
+:py:data:`STATIC_PREPROCESSOR_ROOT <staticpreprocessor.conf.STATIC_PREPROCESSOR_ROOT>` 
+and run your processors on them.
+
+By default, ``preprocess_static`` will empty the target directory before
+processing, to prevent this from happending pass the ``--no-clear`` argument to
+the command.
+
+
+Settings
+--------
+.. py:module:: staticpreprocessor.conf
+
+.. py:data:: STATIC_PREPROCESSOR_ROOT
+
+    The directory to collect the pre-processed static files in. This must be
+    defined.
+
+.. py:data:: STATIC_PREPROCESSOR_STORAGE
+
+    Default: ``'staticpreprocessor.storage.StaticPreprocessorFileStorage'``
+
+    The path to the storage class used to store pre-processed files. You 
+    shouldn't need to change this unless you want to use some form of cloud 
+    storage etc.
+
+.. py:data:: STATIC_PREPROCESSOR_FINDERS
+
+    Default: ``[]``
+
+    The list of finders to use to collect files to be pre-processed. these are
+    run in order, with files collected by one finder being overwritten by
+    files with the same name found by other finders. Should contain
+    dotted-paths to finders.
+
+    Example:
+    ::
+
+        STATIC_PREPROCESSOR_FINDERS = [
+            'staticpreprocessor.finders.FileSystemFinder',
+        ]
+
+.. py:data:: STATIC_PREPROCESSOR_PROCESSORS
+
+    Default: ``[]``
+
+    The list of processors to run against the collected files. These may be
+    specified as dotted-paths or classes/class instances.
+
+    Example:
+    ::
+        
+        from staticpreprocessor.contrib.processors.less import LessProcessor
+        from staticpreprocessor.contrib.processors.sass import SassProcessor
+        from staticpreprocessor.processors import CommandListProcessor
+            
+        STATIC_PREPROCESSOR_PROCESSORS = (
+            'staticpreprocessor.contrib.processors.HandlebarsProcessor',
+            LessProcessor,
+            SassProcessor(),
+            CommandListProcessor(
+                extensions=['.txt'], command='echo {input} > {output}'),
+        )
+
+.. py:data:: STATIC_PREPROCESSOR_DIRS
+
+    Default: ``[]``
+
+    The list of directories that the 
+    :py:class:`FileSystemFinder <staticpreprocessor.finders.FileSystemFinder>` 
+    will look for files in.
