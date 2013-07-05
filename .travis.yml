@@ -5,4 +5,4 @@ install:
     - "pip install -r requirements.txt --use-mirrors"
     - "pip install mock"
 script:
-    - "run_tests.sh"
+    - "./run_tests.sh"
