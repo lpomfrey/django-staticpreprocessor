@@ -1,8 +1,8 @@
 Django Static Preprocessor
 ==========================
 
-:Version: 0.1.0
-:Author: Luke Pomfrey
+.. image:: https://travis-ci.org/lpomfrey/django-staticpreprocessor.png?branch=master
+    :target: https://travis-ci.org/lpomfrey/django-staticpreprocessor
 
 Overview
 --------
