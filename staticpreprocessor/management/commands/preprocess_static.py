@@ -117,7 +117,7 @@ class Command(NoArgsCommand):
         else:
             clear_display = 'This will overwrite existing files!'
 
-        if self.interactive:
+        if self.interactive:  # pragma: no cover
             confirm = input('''
 You have requested to precompile static files at the
 destination location as specified in your settings{0}

@@ -7,11 +7,11 @@ from django.core.files.storage import FileSystemStorage
 from django.utils.datastructures import SortedDict
 from django.utils.functional import memoize
 from django.utils.importlib import import_module
-from django.utils._os import safe_join
 
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.finders import (
-    BaseFinder, AppDirectoriesFinder as BaseAppDirectoriesFinder
+    BaseFinder, FileSystemFinder as BaseFileSystemFinder,
+    AppDirectoriesFinder as BaseAppDirectoriesFinder
 )
 
 from .conf import settings
@@ -21,7 +21,7 @@ from .storage import StaticPreprocessorAppStorage
 _finders = SortedDict()
 
 
-class FileSystemFinder(BaseFinder):
+class FileSystemFinder(BaseFileSystemFinder):
     '''
     A static files finder that uses the ``STATIC_PREPROCESSOR_DIRS`` setting
     to locate files.
@@ -51,35 +51,6 @@ class FileSystemFinder(BaseFinder):
             filesystem_storage = FileSystemStorage(location=root)
             filesystem_storage.prefix = prefix
             self.storages[root] = filesystem_storage
-        super(FileSystemFinder, self).__init__(*args, **kwargs)
-
-    def find(self, path, all=False):
-        '''
-        Looks for files in the extra locations
-        as defined in ``STATIC_PREPROCESSOR_DIRS``.
-        '''
-        matches = []
-        for prefix, root in self.locations:
-            matched_path = self.find_location(root, path, prefix)
-            if matched_path:
-                if not all:
-                    return matched_path
-                matches.append(matched_path)
-        return matches
-
-    def find_location(self, root, path, prefix=None):
-        '''
-        Finds a requested static file in a location, returning the found
-        absolute path (or ``None`` if no match).
-        '''
-        if prefix:
-            prefix = '%s%s' % (prefix, os.sep)
-            if not path.startswith(prefix):
-                return None
-            path = path[len(prefix):]
-        path = safe_join(root, path)
-        if os.path.exists(path):
-            return path
 
     def list(self, ignore_patterns):
         '''
