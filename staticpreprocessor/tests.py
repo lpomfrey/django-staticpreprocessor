@@ -12,7 +12,7 @@ from mock import patch, MagicMock
 
 from staticpreprocessor.conf import StaticPreprocessorAppConf, settings
 from staticpreprocessor.contrib.processors import sass, less
-from staticpreprocessor.finders import FileSystemFinder
+from staticpreprocessor.finders import FileSystemFinder, get_finders
 from staticpreprocessor.processors import (
     BaseProcessor, BaseListProcessor, BaseFileProcessor, CommandProcessorMixin,
     CommandListProcessor, CommandFileProcessor,
@@ -339,3 +339,33 @@ class TestContribProcessors(TestCase):
             processor.get_command(input='input2', output='output2'),
             'lessc --silent    input2 output2',
         )
+
+
+class TestFindersExceptions(TestCase):
+
+    @override_settings(
+        STATIC_PREPROCESSOR_FINDERS=[
+            'staticpreprocessor.finders.WrongFinder',
+        ]
+    )
+    def test_wrong_class(self):
+        with self.assertRaises(ImproperlyConfigured):
+            list(get_finders())
+
+    @override_settings(
+        STATIC_PREPROCESSOR_FINDERS=[
+            'staticpreprocessor.notfinders.FileSystemFinder',
+        ]
+    )
+    def test_wrong_module(self):
+        with self.assertRaises(ImproperlyConfigured):
+            list(get_finders())
+
+    @override_settings(
+        STATIC_PREPROCESSOR_FINDERS=[
+            'staticpreprocessor.processors.BaseProcessor',
+        ]
+    )
+    def test_not_a_finder(self):
+        with self.assertRaises(ImproperlyConfigured):
+            list(get_finders())

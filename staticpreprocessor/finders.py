@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 import os
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import FileSystemStorage
 from django.utils.datastructures import SortedDict
@@ -15,6 +14,7 @@ from django.contrib.staticfiles.finders import (
     BaseFinder, AppDirectoriesFinder as BaseAppDirectoriesFinder
 )
 
+from .conf import settings
 from .storage import StaticPreprocessorAppStorage
 
 
@@ -99,7 +99,7 @@ class AppDirectoriesFinder(BaseAppDirectoriesFinder):
     storage_class = StaticPreprocessorAppStorage
 
 
-def find(path, all=False):
+def find(path, all=False):  # pragma: no cover
     '''
     Find a static file with the given path using all enabled finders.
 
