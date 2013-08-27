@@ -1,3 +1,4 @@
+*.egg
 *.egg-info
 *.py[co]
 *~
@@ -7,6 +8,5 @@
 /dist
 [#]*#
 docs/_build
-docs/_static
-docs/_templates
 .coverage
+.tox

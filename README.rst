@@ -1,11 +1,17 @@
 Django Static Preprocessor
 ==========================
 
+.. image:: https://badge.fury.io/py/django-staticpreprocessor.png
+    :target: http://badge.fury.io/py/django-staticpreprocessor
+
 .. image:: https://travis-ci.org/lpomfrey/django-staticpreprocessor.png?branch=master
     :target: https://travis-ci.org/lpomfrey/django-staticpreprocessor
 
 .. image:: https://coveralls.io/repos/lpomfrey/django-staticpreprocessor/badge.png?branch=master
     :target: https://coveralls.io/r/lpomfrey/django-staticpreprocessor?branch=master
+
+.. image:: https://pypip.in/d/django-staticpreprocessor/badge.png
+        :target: https://crate.io/packages/django-staticpreprocessor?version=latest
 
 Overview
 --------

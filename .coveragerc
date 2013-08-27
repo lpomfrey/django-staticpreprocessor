@@ -1,8 +1,7 @@
 [run]
 omit =
     *tests.py
-    staticpreprocessor/models.py
-include = staticpreprocessor/*
+include = taggit_machinetags/*
 
 [report]
 exclude_lines =

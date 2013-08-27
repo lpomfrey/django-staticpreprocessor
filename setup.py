@@ -23,9 +23,10 @@ version = get_version('staticpreprocessor')
 if sys.argv[-1] == 'publish':
     os.system('python setup.py sdist upload')
     args = {'version': version}
-    print 'You probably want to also tag the version now:'
-    print ' git tag -a {version} -m \'version {version}\''.format(**args)
-    print ' git push --tags'
+    print('You probably want to also tag the version now:')
+    print(' git tag -a release/{version} -m \'version {version}\''.format(
+        **args))
+    print(' git push --tags')
     sys.exit()
 
 
@@ -37,9 +38,10 @@ setup(
     description='Pre-process static files in Django',
     author='Luke Pomfrey',
     author_email='lpomfrey@gmail.com',
-    packages=find_packages(exclude=['test_project']),
+    packages=find_packages(exclude=['test_project', 'test_app']),
     install_requires=open('requirements.txt').read().split('\n'),
     tests_require=['mock'],
+    test_suite='runtests.runtests',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
