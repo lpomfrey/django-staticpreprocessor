@@ -232,11 +232,11 @@ class TestBaseFileProcessor(TestCase):
 
 class TestCommandProcessorMixin(TestCase):
 
-    @patch('staticpreprocessor.processors.envoy')
-    def test_bails_on_no_input(self, envoy):
+    @patch('staticpreprocessor.processors.subprocess')
+    def test_bails_on_no_input(self, subprocess):
         mixin = CommandProcessorMixin(require_input=True)
         mixin.run_command('')
-        self.assertFalse(envoy.run.called)
+        self.assertFalse(subprocess.call.called)
 
     def test_get_command(self):
         mixin = CommandProcessorMixin()
@@ -245,9 +245,9 @@ class TestCommandProcessorMixin(TestCase):
             input='/an/input/file.txt', output='output.txt')
         self.assertEqual(command, 'cat /an/input/file.txt > output.txt')
 
-    @patch('staticpreprocessor.processors.envoy')
-    def test_run_command(self, envoy):
-        envoy.run.return_value.status_code = 0
+    @patch('staticpreprocessor.processors.subprocess')
+    def test_run_command(self, subprocess):
+        subprocess.call.return_value = 0
         storage = MagicMock()
         storage.path.side_effect = lambda f: os.path.join('/prefix/path/', f)
         mixin = CommandProcessorMixin(
@@ -256,12 +256,12 @@ class TestCommandProcessorMixin(TestCase):
             storage=storage,
         )
         mixin.run_command('input.txt')
-        envoy.run.assert_called_with(
-            'cat input.txt > /prefix/path/js/processed.js')
+        subprocess.call.assert_called_with(
+            ['cat', 'input.txt', '>', '/prefix/path/js/processed.js'])
 
-    @patch('staticpreprocessor.processors.envoy')
-    def test_run_command_failure(self, envoy):
-        envoy.run.return_value.status_code = 1
+    @patch('staticpreprocessor.processors.subprocess')
+    def test_run_command_failure(self, subprocess):
+        subprocess.call.return_value = 1
         mixin = CommandProcessorMixin(
             output='js/processed.js',
             command='cat {input} > {output}',

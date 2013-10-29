@@ -2,12 +2,13 @@
 from __future__ import unicode_literals
 
 import fnmatch
-import itertools
 import os
 import re
+import shlex
+import subprocess
 
-import envoy
 from django.contrib.staticfiles.utils import get_files
+from django.utils.six.moves import filter
 
 from .storage import default_storage
 
@@ -32,25 +33,25 @@ class BaseProcessor(object):
         file_list = get_files(
             self.storage, location=settings.STATIC_PREPROCESSOR_ROOT)
         if self.extensions is not None:
-            file_list = itertools.ifilter(
+            file_list = filter(
                 lambda f: os.path.splitext(f)[1] in self.extensions, file_list)
         if self.exclude_match:
-            file_list = itertools.ifilter(
+            file_list = filter(
                 lambda f: not fnmatch.fnmatch(f, self.exclude_match),
                 file_list
             )
         if self.exclude_regex:
             exclude_regex = re.compile(self.exclude_regex)
-            file_list = itertools.ifilter(
+            file_list = filter(
                 lambda f: not bool(exclude_regex.search(f)), file_list)
         if self.include_match:
-            file_list = itertools.ifilter(
+            file_list = filter(
                 lambda f: fnmatch.fnmatch(f, self.include_match),
                 file_list
             )
         if self.include_regex:
             include_regex = re.compile(self.include_regex)
-            file_list = itertools.ifilter(
+            file_list = filter(
                 lambda f: bool(include_regex.search(f)), file_list)
         return file_list
 
@@ -101,12 +102,18 @@ class CommandProcessorMixin(BaseProcessor):
             'output': self.storage.path(self.output),
         })
         command = self.get_command(**kwargs)
-        r = envoy.run(command)
-        if not r.status_code in self.expected_return_codes:
+        try:
+            return_code = subprocess.call(shlex.split(command))
+        except OSError as e:
             raise RuntimeError(
-                'Static preprocessor command returned an unexpected return '
-                'code. Got: {0} Expected one of: {1}'
-                .format(r.status_code, self.expected_return_codes))
+                'Static preprocessor command failed: {0}'.format(e))
+        else:
+            if not return_code in self.expected_return_codes:
+                raise RuntimeError(
+                    'Static preprocessor command returned an unexpected '
+                    'return code. Got: {0} Expected one of: {1}'
+                    .format(return_code, self.expected_return_codes)
+                )
 
 
 class CommandListProcessor(CommandProcessorMixin, BaseListProcessor):
