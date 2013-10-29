@@ -5,7 +5,6 @@ from django.contrib.staticfiles.storage import AppStaticStorage
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.utils.functional import LazyObject
 
-from staticpreprocessor.conf import settings
 
 
 class StaticPreprocessorAppStorage(AppStaticStorage):
@@ -16,6 +15,7 @@ class StaticPreprocessorAppStorage(AppStaticStorage):
 class StaticPreprocessorFileStorage(FileSystemStorage):
 
     def __init__(self, location=None, base_url=None, *args, **kwargs):
+        from staticpreprocessor.conf import settings
         if location is None:
             location = settings.STATIC_PREPROCESSOR_ROOT
         super(StaticPreprocessorFileStorage, self).__init__(
@@ -33,6 +33,7 @@ class StaticPreprocessorFileStorage(FileSystemStorage):
 
 class DefaultStorage(LazyObject):
     def _setup(self):
+        from staticpreprocessor.conf import settings
         self._wrapped = get_storage_class(
             settings.STATIC_PREPROCESSOR_STORAGE)()
 

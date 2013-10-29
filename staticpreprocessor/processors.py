@@ -9,7 +9,6 @@ import re
 import envoy
 from django.contrib.staticfiles.utils import get_files
 
-from .conf import settings
 from .storage import default_storage
 
 
@@ -29,6 +28,7 @@ class BaseProcessor(object):
                 setattr(self, k, v)
 
     def get_file_list(self, **kwargs):
+        from .conf import settings
         file_list = get_files(
             self.storage, location=settings.STATIC_PREPROCESSOR_ROOT)
         if self.extensions is not None:

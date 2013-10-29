@@ -14,7 +14,6 @@ from django.contrib.staticfiles.finders import (
     AppDirectoriesFinder as BaseAppDirectoriesFinder
 )
 
-from .conf import settings
 from .storage import StaticPreprocessorAppStorage
 
 
@@ -27,6 +26,7 @@ class FileSystemFinder(BaseFileSystemFinder):
     to locate files.
     '''
     def __init__(self, apps=None, *args, **kwargs):
+        from .conf import settings
         # List of locations with static files
         self.locations = []
         # Maps dir paths to an appropriate storage instance
@@ -92,6 +92,7 @@ def find(path, all=False):  # pragma: no cover
 
 
 def get_finders():
+    from .conf import settings
     for finder_path in settings.STATIC_PREPROCESSOR_FINDERS:
         yield get_finder(finder_path)
 
