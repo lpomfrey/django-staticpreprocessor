@@ -91,12 +91,17 @@ class Command(NoArgsCommand):
             elif isinstance(processor, type) and \
                     issubclass(processor, processors.BaseProcessor):
                 pre_processors.append(processor())
-            elif isinstance(processor, string_types):
+            elif isinstance(processor, (tuple, list) + string_types):
                 try:
-                    module, attr = processor.rsplit('.', 1)
+                    if isinstance(processor, (tuple, list)):
+                        klass, kwargs = processor[0], processor[1]
+                    else:
+                        klass, kwargs = processor, {}
+                    module, attr = klass.rsplit('.', 1)
                     module = import_module(module)
-                    pre_processors.append(getattr(module, attr)())
-                except (ValueError, ImportError, AttributeError):
+                    pre_processors.append(getattr(module, attr)(**kwargs))
+                except (IndexError, TypeError, ValueError,
+                        ImportError, AttributeError):
                     raise ImproperlyConfigured(
                         '"{0}" is an invalid preprocessor'.format(processor))
         return pre_processors
@@ -140,13 +145,13 @@ Type 'yes' to continue, or 'no' to cancel: '''.format(
         for processor in self.get_processors():
             self.log(
                 'Running processor: {0}\n'.format(
-                processor.__class__.__name__),
+                    processor.__class__.__name__),
                 level=1
             )
             processor.handle()
             self.log(
                 'Finished running processor: {0}'.format(
-                processor.__class__.__name__),
+                    processor.__class__.__name__),
                 level=2
             )
         self.log('Completed pre-processing static files.\n', level=1)

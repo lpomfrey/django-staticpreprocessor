@@ -52,8 +52,9 @@ In order to use the finders they should be added to the
 setting, e.g.:
 ::
 
-    STATIC_PREPROCESSOR_DIRS = \
-        os.path.join(os.path.dirname(__file__), 'rawstatic/')
+    STATIC_PREPROCESSOR_DIRS = (
+        os.path.join(os.path.dirname(__file__), 'rawstatic/'),
+    )
     STATIC_PREPROCESSOR_FINDERS = (
         'staticpreprocessor.finders.FileSystemFinder',
         'staticpreprocessor.finders.AppDirectoriesFinder',
@@ -68,7 +69,9 @@ Processors are the classes that do the actual work of pre-processing your
 static files.
 
 Processors can be specified in the ``STATIC_PREPROCESSORS_PROCESSORS`` setting
-as either dotted-paths, or otherwise, e.g.:
+as either dotted-paths, or otherwise, if a tuple or list is given it will be
+taken as the dotted path to the processor and a dictionary of keyword
+arguments, e.g.:
 ::
 
     from staticpreprocessor.contrib.processors.less import LessProcessor
@@ -79,6 +82,8 @@ as either dotted-paths, or otherwise, e.g.:
         'staticpreprocessor.contrib.processors.HandlebarsProcessor',
         LessProcessor,
         SassProcessor(),
+        ('staticpreprocessor.processors.CommandListProcessor',
+         dict(extensions=['.txt'], command='echo {input} > {output}')),
         CommandListProcessor(
             extensions=['.txt'], command='echo {input} > {output}'),
     )
