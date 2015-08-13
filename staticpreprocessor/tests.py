@@ -63,8 +63,7 @@ class TestFileSystemFinderExceptions(TestCase):
         ('some-prefix', os.path.join(TEST_PROJECT, 'rawstaticprefixed')),
         os.path.join(TEST_PROJECT, 'rawstatic'),
     ],
-    STATIC_PREPROCESSOR_ROOT=
-    os.path.join(TEST_PROJECT, 'processedstatic'),
+    STATIC_PREPROCESSOR_ROOT=os.path.join(TEST_PROJECT, 'processedstatic'),
     STATIC_PREPROCESSOR_FINDERS=[
         'staticpreprocessor.finders.FileSystemFinder',
     ]
@@ -105,8 +104,7 @@ class TestFileSystemFinderCollection(TestCase):
 
 
 @override_settings(
-    STATIC_PREPROCESSOR_ROOT=
-    os.path.join(TEST_PROJECT, 'processedstatic'),
+    STATIC_PREPROCESSOR_ROOT=os.path.join(TEST_PROJECT, 'processedstatic'),
     STATIC_PREPROCESSOR_FINDERS=[
         'staticpreprocessor.finders.AppDirectoriesFinder',
     ],
@@ -327,17 +325,15 @@ class TestContribProcessors(TestCase):
         )
 
     def test_less_get_command(self):
-        processor = less.LessProcessor(
-            compress=True, yui_compress=True, optimization=2)
+        processor = less.LessProcessor(compress=True)
         self.assertEqual(
             processor.get_command(input='input', output='output'),
-            'lessc --silent --compress --yui-compress -O2 input output',
+            'lessc --compress input output',
         )
-        processor = less.LessProcessor(
-            compress=False, yui_compress=False, optimization=None)
+        processor = less.LessProcessor(compress=False)
         self.assertEqual(
             processor.get_command(input='input2', output='output2'),
-            'lessc --silent    input2 output2',
+            'lessc  input2 output2',
         )
 
 

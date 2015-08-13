@@ -39,7 +39,7 @@ class Command(NoArgsCommand):
                  'before trying to copy or link the original file.'),
     )
     help = 'Precompile static files'
-    requires_model_validation = False
+    requires_model_validation = True
 
     def __init__(self, *args, **kwargs):
         super(NoArgsCommand, self).__init__(*args, **kwargs)
@@ -157,7 +157,7 @@ Type 'yes' to continue, or 'no' to cancel: '''.format(
         self.log('Completed pre-processing static files.\n', level=1)
         if destination_path:
             self.log(
-                'Results are in{0}'.format(self.destination_display),
+                'Results are in{0}'.format(destination_display),
                 level=1
             )
 

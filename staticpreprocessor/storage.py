@@ -1,15 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.contrib.staticfiles.storage import AppStaticStorage
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.utils.functional import LazyObject
-
-
-
-class StaticPreprocessorAppStorage(AppStaticStorage):
-
-    source_dir = 'rawstatic'
 
 
 class StaticPreprocessorFileStorage(FileSystemStorage):

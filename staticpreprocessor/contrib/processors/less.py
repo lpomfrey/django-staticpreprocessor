@@ -13,12 +13,7 @@ class LessProcessor(CommandListProcessor):
     output = 'less_styles.css'
 
     def get_command(self, **kwargs):
-        return 'lessc {compress_string} {yui_compress_string} '\
-            '{optimization_string} {input} {output}'.format(
-                compress_string='--compress' if self.compress else '',
-                yui_compress_string='--yui-compress'
-                if self.yui_compress else '',
-                optimization_string='-O{0}'.format(self.optimization)
-                if self.optimization is not None else '',
-                **kwargs
-            )
+        return 'lessc {compress_string} {input} {output}'.format(
+            compress_string='--compress' if self.compress else '',
+            **kwargs
+        )
