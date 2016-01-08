@@ -1,3 +1,10 @@
+UNSUPPORTED - DO NOT USE
+========================
+
+I no longer use or maintain this. There are a million and one frontend build 
+systems out there that you should use instead of trying to shoehorn that 
+functionality into your web framework!
+
 Django Static Preprocessor
 ==========================
 
@@ -9,9 +16,6 @@ Django Static Preprocessor
 
 .. image:: https://coveralls.io/repos/lpomfrey/django-staticpreprocessor/badge.png?branch=master
     :target: https://coveralls.io/r/lpomfrey/django-staticpreprocessor?branch=master
-
-.. image:: https://pypip.in/d/django-staticpreprocessor/badge.png
-        :target: https://crate.io/packages/django-staticpreprocessor?version=latest
 
 Overview
 --------
