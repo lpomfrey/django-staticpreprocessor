@@ -1,5 +1,6 @@
-UNSUPPORTED - DO NOT USE
-========================
+.. image:: http://unmaintained.tech/badge.svg
+     :target: http://unmaintained.tech/
+     :alt: No Maintenance Intended
 
 I no longer use or maintain this. There are a million and one frontend build 
 systems out there that you should use instead of trying to shoehorn that 
